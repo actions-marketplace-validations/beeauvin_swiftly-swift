@@ -1,0 +1,34 @@
+# Copyright © 2025 Cassidy Spring (Bee).
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+name: tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        swift-version: ['latest', '6.1']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          swift-version: ${{ matrix.swift-version }}
+      - name: test - latest
+        if: ${{ matrix.swift-version == 'latest' }}
+        shell: bash
+        run: swift --version | grep -q 'Swift version'
+      - name: test - version
+        if: ${{ matrix.swift-version != 'latest' }}
+        shell: bash
+        run: swift --version | grep -q 'Swift version ${{ matrix.swift-version }}'
